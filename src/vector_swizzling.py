@@ -154,7 +154,7 @@ class SVec4(SVec):
         super().__init__(x=x, y=y, z=z, w=w)
 
 
-# All the functions belos could be methods, but since
+# All the functions below could be methods, but since
 # I aim for similarity with OpenGL, I added them as
 # standalone functions
 
@@ -185,19 +185,48 @@ def projection(a: SVec, b: SVec):
 
 
 # 2D vector functions
-def angle(a: SVec2):
+def sangle(a: SVec2):
     return math.atan2(a.y, a.x)
 
-def angle_between(a: SVec2, b: SVec2):
-    return math.acos(sdot(a, b) / (slength(a) * slength(b)))
+def sangle_between(a: SVec2, b: SVec2):
+    dot_prod = sdot(a, b)
+    cross_prod = a.x * b.y - a.y * b.x
+    angle = math.acos(min(1, max(-1, dot_prod / (slength(a) * slength(b)))))
+    if cross_prod < 0:
+        angle = -angle
+    return angle
 
-def rotate(a: SVec2, angle: Union[float,int]):
+def srotate(a: SVec2, angle: Union[float,int]):
     c = math.cos(angle)
     s = math.sin(angle)
     return SVec2(a.x * c - a.y * s, a.x * s + a.y * c)
 
 
 # 3D vector functions
-def cross(a: SVec3, b: SVec3):
+def scross(a: SVec3, b: SVec3):
     return SVec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
+
+def sazimuth_elevation_between(a: SVec3, b: SVec3):
+    # Azimuth
+    azimuth = -sangle_between(a.xz, b.xz)
+
+    # Elevation angle is a bit different
+    # We gotta take into account both x and z components
+    # to get vectors as hipotenuses of a right triangle
+    # made with their projection to the xz plane
+    ah = snormalize(SVec2(slength(a.xz), a.y))
+    bh = snormalize(SVec2(slength(b.xz), b.y))
+    elevation = sangle_between(ah, bh)
+
+    return azimuth, elevation
+
+def srotate_by_azimuth_elevation(a: SVec2, azimuth: Union[float,int], elevation: Union[float,int]):
+    # Elevation rotation
+    elevation_2d = srotate(SVec2(slength(a.xz), a.y), elevation)
+    a = SVec3(elevation_2d.xy,0);
+
+    # Azimuth rotation
+    a.xz = srotate(a.xz, sangle_between(a.xz, SVec2(1,0))+azimuth)
+
+    return a
 
