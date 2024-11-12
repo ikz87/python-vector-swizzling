@@ -176,3 +176,28 @@ def snormalize(a: SVec):
         return a
     normalized_vec = copy.copy(a)
     return normalized_vec/length
+
+def distance(a: SVec, b: SVec):
+    return slength(a - b)
+
+def projection(a: SVec, b: SVec):
+    return b * sdot(a, b) / sdot(b, b)
+
+
+# 2D vector functions
+def angle(a: SVec2):
+    return math.atan2(a.y, a.x)
+
+def angle_between(a: SVec2, b: SVec2):
+    return math.acos(sdot(a, b) / (slength(a) * slength(b)))
+
+def rotate(a: SVec2, angle: Union[float,int]):
+    c = math.cos(angle)
+    s = math.sin(angle)
+    return SVec2(a.x * c - a.y * s, a.x * s + a.y * c)
+
+
+# 3D vector functions
+def cross(a: SVec3, b: SVec3):
+    return SVec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
+
