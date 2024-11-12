@@ -13,25 +13,43 @@ class Vec:
     def __str__(self):
         return self.toList().__repr__()
 
-    def __getattr__(self, attr):
-        if attr.startswith('__'):
-            raise AttributeError(attr)
+    def __getattr__(self, swizzle):
+        if swizzle.startswith('__'):
+            raise AttributeError(swizzle)
         # Allow using rgba instead of xyzw
         for (i,j) in ('x','r'),('y','g'),('z','b'),('w','a'):
-            attr = attr.replace(j,i)
-        if (not 'x' in attr and not 'y' in attr and not 'z' in attr and not 'w' in attr):
-            raise AttributeError(attr)
-        if len(attr) == 1:
-            return getattr(self, attr)
-        if len(attr) == 2:
-            return Vec2(getattr(self, attr[0]), getattr(self, attr[1]))
-        if len(attr) == 3:
-            return Vec3(getattr(self, attr[0]), getattr(self, attr[1]), getattr(self, attr[2]))
-        if len(attr) == 4:
-            return Vec3(getattr(self, attr[0]), getattr(self, attr[1]), getattr(self, attr[2]), getattr(self, attr[3]))
+            swizzle = swizzle.replace(j,i)
+        if (not 'x' in swizzle and not 'y' in swizzle and not 'z' in swizzle and not 'w' in swizzle):
+            raise AttributeError(swizzle)
+        if len(swizzle) == 1:
+            return getattr(self, swizzle)
+        if len(swizzle) == 2:
+            return Vec2(getattr(self, swizzle[0]), getattr(self, swizzle[1]))
+        if len(swizzle) == 3:
+            return Vec3(getattr(self, swizzle[0]), getattr(self, swizzle[1]), getattr(self, swizzle[2]))
+        if len(swizzle) == 4:
+            return Vec3(getattr(self, swizzle[0]), getattr(self, swizzle[1]), getattr(self, swizzle[2]), getattr(self, swizzle[3]))
         else:
-             swizzled_components = {f"comp_{i}": getattr(self, char) for i, char in enumerate(attr)}
+             swizzled_components = {f"comp_{i}": getattr(self, char) for i, char in enumerate(swizzle)}
              return Vec(**swizzled_components)
+
+    def __setattr__(self, swizzle, other):
+        if swizzle.startswith('__'):
+            raise AttributeError(swizzle)
+        # Allow using rgba instead of xyzw
+        for (i,j) in ('x','r'),('y','g'),('z','b'),('w','a'):
+            swizzle = swizzle.replace(j,i)
+        if (not 'x' in swizzle and not 'y' in swizzle and not 'z' in swizzle and not 'w' in swizzle):
+            raise AttributeError(swizzle)
+        if len(swizzle) == 1:
+            if not isinstance(other, int) and not isinstance(other, float):
+                raise TypeError(f"Expected a float, got {type(other)}")
+            super().__setattr__(swizzle, other)
+            return
+        if other.size() != len(swizzle):
+            raise ValueError(f"Vector must have the same size")
+        for i, attr in enumerate(vars(other)):
+            setattr(self, swizzle[i], getattr(other, attr))
 
     def __add__(self, other):
         if self.size() != other.size():
@@ -107,3 +125,6 @@ def normalize(a: Vec):
 
 a = Vec3(1.5,2,3)
 b = Vec3(4,5,6)
+print(b.xyz)
+a.zyx = b.xxz
+print(a)
