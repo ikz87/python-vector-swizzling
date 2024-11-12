@@ -36,6 +36,8 @@ class SVec:
                 setattr(self, name, value)
                 setattr(self, next_name, next_value)
                 setattr(self, next_next_name, next_next_value)
+            else:
+                raise ValueError(f"Invalid component type for {name}, got {type(value)}")
                 i += 3
                 j += 1
 
