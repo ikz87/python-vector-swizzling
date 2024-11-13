@@ -42,7 +42,7 @@ class SVec:
                 j += 1
 
     def __str__(self):
-        return self.toList().__repr__()
+        return [round(value, 2) for value in self.toList()].__repr__()
 
     def __getattr__(self, swizzle):
         if swizzle.startswith('__'):
@@ -177,24 +177,25 @@ def snormalize(a: SVec):
     normalized_vec = copy.copy(a)
     return normalized_vec/length
 
-def distance(a: SVec, b: SVec):
+def sdistance(a: SVec, b: SVec):
     return slength(a - b)
 
-def projection(a: SVec, b: SVec):
+def sprojection(a: SVec, b: SVec):
     return b * sdot(a, b) / sdot(b, b)
+
+def sangle_between(a: SVec, b: SVec):
+    if slength(a) * slength(b) == 0:
+        return 0
+    a = snormalize(a)
+    b = snormalize(b)
+    dot = sdot(a, b)
+    angle = math.acos(min(1, max(-1, dot)))
+    return angle
 
 
 # 2D vector functions
 def sangle(a: SVec2):
     return math.atan2(a.y, a.x)
-
-def sangle_between(a: SVec2, b: SVec2):
-    dot_prod = sdot(a, b)
-    cross_prod = a.x * b.y - a.y * b.x
-    angle = math.acos(min(1, max(-1, dot_prod / (slength(a) * slength(b)))))
-    if cross_prod < 0:
-        angle = -angle
-    return angle
 
 def srotate(a: SVec2, angle: Union[float,int]):
     c = math.cos(angle)
@@ -205,6 +206,21 @@ def srotate(a: SVec2, angle: Union[float,int]):
 # 3D vector functions
 def scross(a: SVec3, b: SVec3):
     return SVec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
+
+def srotate_x(a: SVec3, angle: Union[float, int]):
+    c = math.cos(angle)
+    s = math.sin(angle)
+    return SVec3(a.x, a.y * c - a.z * s, a.y * s + a.z * c)
+
+def srotate_y(a: SVec3, angle: Union[float, int]):
+    c = math.cos(angle)
+    s = math.sin(angle)
+    return SVec3(a.x * c + a.z * s, a.y, a.z * c - a.x * s)
+
+def srotate_z(a: SVec3, angle: Union[float, int]):
+    c = math.cos(angle)
+    s = math.sin(angle)
+    return SVec3(a.x * c - a.y * s, a.y * c + a.x * s, a.z)
 
 def sazimuth_elevation_between(a: SVec3, b: SVec3):
     # Azimuth
@@ -222,11 +238,21 @@ def sazimuth_elevation_between(a: SVec3, b: SVec3):
 
 def srotate_by_azimuth_elevation(a: SVec2, azimuth: Union[float,int], elevation: Union[float,int]):
     # Elevation rotation
-    elevation_2d = srotate(SVec2(slength(a.xz), a.y), elevation)
-    a = SVec3(elevation_2d.xy,0);
+    result = SVec3(srotate(SVec2(slength(a.xz), a.y), elevation),0)
 
     # Azimuth rotation
-    a.xz = srotate(a.xz, sangle_between(a.xz, SVec2(1,0))+azimuth)
+    result.xz = srotate(result.xz, sangle_between(a.xz, SVec2(1,0))+azimuth)
 
-    return a
+    return result
 
+def sorthonormal_basis(a: SVec3, reference=SVec3(0,1,0)):
+    a = snormalize(a)
+
+    # If vectors are colinear, change reference
+    if abs(sdot(a, reference)) == 1:
+        reference = reference.zxy
+
+    base_x = snormalize(scross(a, reference))
+    base_y = snormalize(scross(a, base_x))
+
+    return a, base_x, base_y
