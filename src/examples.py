@@ -57,7 +57,7 @@ print(f"c.wzy.z = {c.wzy.z}")
 print(f"c.xyzwxyzw = {c.xyzwxyzw}")
 # Vectors beyond 4D can still use all dimension agnostic functions
 # like snormalize
-print(f"snormalize(b.xxyyzz) = {snormalize(b.xxyyzz)}")
+print(f"snormalize(c.xzywxzyw) = {snormalize(c.xyzwxyzw)}")
 # However, if you swizzle that resulting vector again, you can only do so
 # up to the 4th component
 print(f"c.xyzwxyzw.xyzw = {c.xyzwxyzw.xyzw}")
@@ -66,6 +66,6 @@ print(f"c.xyzwxyzw.xyzw = {c.xyzwxyzw.xyzw}")
 # Since vectors are just cool lists, you can use indices instead
 print(f"c.xyzwxyzw[7] = {c.xyzwxyzw[7]}")
 # And as you might have guessed, you can iterate over them
-print("Components of a: ")
-for i in a:
+print("Components of c.xyzwxyzw: ")
+for i in c.xyzwxyzw:
     print(i)
