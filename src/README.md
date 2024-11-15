@@ -69,3 +69,13 @@ snormalize(d.xyzwxyz)
 d.xyzwxyz.xyzw
             #^ You run out of swizzles here
 ```
+### Vectors as lists
+Vectors are just cool lists, so you can use them as such
+```python
+# Iterate over vector components
+for i in d.xyzwxyz:
+    print(i)
+
+# Assign to a component with its index
+d[3] = 1
+```
