@@ -1,4 +1,4 @@
-# vector_swizzling
+# vector-swizzling
 
 The `vector_swizzling` library provides flexible and intuitive vector manipulation with swizzling capabilities, designed to resemble GLSL vector handling for 2D, 3D, and 4D vectors.
 
