@@ -1,4 +1,4 @@
-# vector-swizzling
+# python-vector-swizzling
 
 The `vector_swizzling` library provides flexible and intuitive vector manipulation with swizzling capabilities, designed to resemble GLSL vector handling for 2D, 3D, and 4D vectors.
 
@@ -14,11 +14,11 @@ The main `SVec` class has three subclasses for specific dimensions:
 These subclasses come with dimension-specific operations, such as `srotate` for `SVec2` and `scross` for `SVec3`.
 
 ### Component Lookup Table
-The swizzling table maps the following:
-- `'x' = 'r' = 0`
-- `'y' = 'g' = 1`
-- `'z' = 'b' = 2`
-- `'w' = 'a' = 3`
+The swizzling table maps to the following indices:
+- `'x' or 'r' = 0`
+- `'y' or 'g' = 1`
+- `'z' or 'b' = 2`
+- `'w' or 'a' = 3`
 
 This table lets you use letters from both Cartesian (`x`, `y`, `z`, `w`) and color (`r`, `g`, `b`, `a`) spaces interchangeably.
 
@@ -42,7 +42,7 @@ d = SVec4([4, 3, 2], 1)
 # Using vectors as components
 b = SVec3(a, 3)
 c = SVec4(b, 4)`
-d = SVec4(c.xyz, 5)
+d = SVec4(c.wzy, 1)
 ```
 
 ### Swizzling Vectors
@@ -62,8 +62,8 @@ cross_vec = scross(a.xyx, b)
 ### Swizzling quirks
 This module allows higher dimensional swizzles and swizzle chaining:
 ```python
-# Swizzle an SVec4 to a 7D SVec and call a dimension agnostic function on it
-snormalize(d.xyzwxyz)
+# Swizzle an SVec4 into a 7D SVec and call a dimension agnostic function on it
+normalized_7D_vector = snormalize(d.xyzwxyz)
 
 # Swizzle chaining is permitted but only works for the first 4 components, just like GLSL
 d.xyzwxyz.xyzw
