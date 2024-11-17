@@ -49,19 +49,21 @@ class SVec:
             return SVec(*swizzled_components)
 
     def __setattr__(self, swizzle, other):
-        if swizzle == "components" or swizzle == "lookup":
+        if swizzle in {"components", "lookup"}:
             super().__setattr__(swizzle, other)
             return
-
         for component in swizzle:
-            if not component in self.lookup:
+            if component not in self.lookup:
                 raise AttributeError(f"'{type(self).__name__}' object has no component '{component}'")
-        if len(swizzle) > len(other):
-            raise ValueError("Number of swizzle components must match the vector's size")
-
-        for component, value in swizzle, other:
-            self.components[self.lookup[component]] = value
-
+        if len(swizzle) == 1:
+            if not isinstance(other, (int, float)):
+                raise TypeError(f"Expected a single number for assignment to '{swizzle}', got {type(other).__name__}")
+            self.components[self.lookup[swizzle]] = other
+        else:
+            if not hasattr(other, "__iter__") or len(swizzle) != len(other):
+                raise ValueError(f"Number of swizzle components must match the size of the value being assigned")
+            for component, value in zip(swizzle, other):
+                self.components[self.lookup[component]] = value
 
     def __add__(self, other):
         if len(self) != len(other):
