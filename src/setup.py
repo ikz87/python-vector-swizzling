@@ -2,8 +2,9 @@ from setuptools import setup, find_packages
 
 setup(
     name="vector-swizzling",
-    version="0.1.0",
-    packages=find_packages(),
+    version="0.1.2",
+    packages=find_packages(where="src"),  # Discover packages under 'src'
+    package_dir={"": "src"},  # Root directory is 'src'
     install_requires=[],
     description="A versatile vector operations module with swizzling capabilities for 2D, 3D, and 4D vectors.",
     long_description=open("README.md").read(),

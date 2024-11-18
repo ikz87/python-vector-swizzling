@@ -1,0 +1,10 @@
+README.md
+src/README.md
+src/examples.py
+src/setup.py
+src/__pycache__/main.cpython-312.pyc
+src/vector_swizzling/__init__.py
+src/vector_swizzling.egg-info/PKG-INFO
+src/vector_swizzling.egg-info/SOURCES.txt
+src/vector_swizzling.egg-info/dependency_links.txt
+src/vector_swizzling.egg-info/top_level.txt
